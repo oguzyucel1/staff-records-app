@@ -76,41 +76,41 @@ Aşağıda uygulamanın bazı temel ekran görüntüleri yer almaktadır:
 ### 🔐 Giriş Ekranı
 Kullanıcıların uygulamaya erişim sağladığı basit ve güvenli giriş arayüzü.
 
-![Giriş Ekranı](./assets/screens/login.png)
+![Giriş Ekranı](./assets/screenshots/login.png)
 
 ---
 
 ### 📷 Ana Sayfa
 Admin'in bütün istatistikleri görebildiği ve yönetimlere erişebildiği arayüz.
 
-![Ana Sayfa](./assets/screens/admin.png)
+![Ana Sayfa](./assets/screenshots/admin.png)
 
 ---
 
 ### 🧑‍💼 Admin Paneli
 Yöneticilerin günlük QR kod oluşturduğu, giriş/çıkışları ve izinleri görüntülediği panel.
 
-![Admin Panel](./assets/screens/ap1.png)
+![Admin Panel](./assets/screenshots/ap1.png)
 
 ---
 
 ### 📝 İzin Talep Formu
 Personellerin ders saati ve neden belirterek izin başvurusunda bulunduğu ekran.
 
-![İzin Talep Ekranı](./assets/screens/izin.png)
+![İzin Talep Ekranı](./assets/screenshots/izin.png)
 
 ---
 
 ### 📊 Kayıt Listesi
 Tarih ve personele göre filtrelenmiş giriş/çıkış kayıtlarının görüntülendiği log ekranı.
 
-![Kayıt Listesi](./assets/screens/kayıt.png)
+![Kayıt Listesi](./assets/screenshots/kayıt.png)
 
 ---
 
 ### 📊 Kullanıcı Ekranı
 Kullanıcıların izin durumlarını görüntülediği ve karekodlarını okutabildiği arayüz.
 
-![Kullanıcı Ekranı](./assets/screens/userhome.png)
+![Kullanıcı Ekranı](./assets/screenshots/userhome.png)
 
 
