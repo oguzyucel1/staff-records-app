@@ -1,0 +1,55 @@
+{
+  "expo": {
+    "name": "staffapp",
+    "slug": "staffapp",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/appicon.png",
+    "scheme": "staffapp",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "userInterfaceStyle": "automatic",
+      "keyboardDisplayRequiresUserAction": false
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#4c669f"
+      },
+      "edgeToEdgeEnabled": true,
+      "softwareKeyboardLayoutMode": "pan",
+      "permissions": [
+        "android.permission.CAMERA"
+      ]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-barcode-scanner"
+    ],
+    "splash": {
+      "backgroundColor": "#4c669f",
+      "resizeMode": "contain"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "tsconfigPaths": true
+    },
+    "jsEngine": "hermes",
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "a854bbcb-c183-43e9-b492-6a5d0bb913dc"
+      }
+    }
+  }
+}
