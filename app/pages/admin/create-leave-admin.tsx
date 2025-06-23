@@ -19,6 +19,7 @@ import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { Calendar } from "react-native-calendars";
 import { MaskedTextInput } from "react-native-mask-text";
+import { NotificationService } from "../../../lib/notificationService";
 
 interface UserProfile {
   id: string;
@@ -212,27 +213,63 @@ export default function CreateLeaveAdminScreen() {
         data: { user: adminUser },
       } = await supabase.auth.getUser();
       if (!adminUser) throw new Error("Oturum bulunamadı");
-      const { error } = await supabase.from("leave_requests").insert({
-        user_id: selectedUser.id,
-        start_date: startDate.toISOString().split("T")[0],
-        end_date: endDate.toISOString().split("T")[0],
-        start_time: startTime,
-        end_time: endTime,
-        course_code: courseCode.trim(),
-        replaced_lecturer: replacedLecturer.id,
-        reason: reason.trim(),
-        status: "approved",
-        is_created_by_admin: true,
-        created_by: adminUser.id,
-      });
+      const { error, data } = await supabase
+        .from("leave_requests")
+        .insert({
+          user_id: selectedUser.id,
+          start_date: startDate.toISOString().split("T")[0],
+          end_date: endDate.toISOString().split("T")[0],
+          start_time: startTime,
+          end_time: endTime,
+          course_code: courseCode.trim(),
+          replaced_lecturer: replacedLecturer.id,
+          reason: reason.trim(),
+          status: "approved",
+          is_created_by_admin: true,
+          created_by: adminUser.id,
+          leave_type: "yönetici izni",
+        })
+        .select();
       if (error) throw error;
+      // Bildirim gönder (hem kullanıcıya hem yerine gelen hocaya)
+      const leaveRequestId = data && data[0] && data[0].id;
+      if (leaveRequestId) {
+        // Kullanıcıya bildirim
+        await NotificationService.createLeaveNotification(
+          selectedUser.id,
+          leaveRequestId,
+          "yönetici izni",
+          startDate.toISOString().split("T")[0],
+          endDate.toISOString().split("T")[0],
+          true
+        );
+        // Yerine gelen hocaya bildirim
+        await NotificationService.createNotification(
+          replacedLecturer.id,
+          "leave_approved",
+          "Ders Temsilciliği",
+          `${selectedUser.full_name} (${courseCode}) dersi için ${formatDate(startDate)} - ${formatDate(endDate)} arası yerine siz görevlendirildiniz!`,
+          {
+            leave_request_id: leaveRequestId,
+            leave_type: "yönetici izni",
+            start_date: startDate.toISOString().split("T")[0],
+            end_date: endDate.toISOString().split("T")[0],
+            replaced_for: selectedUser.id,
+            course_code: courseCode.trim(),
+          }
+        );
+      }
       Alert.alert(
         "Başarılı",
         `${selectedUser.full_name} için izin oluşturuldu!`,
         [{ text: "Tamam", onPress: () => router.back() }]
       );
     } catch (e) {
-      Alert.alert("Hata", "Kayıt sırasında hata oluştu");
+      let message = "Kayıt sırasında hata oluştu";
+      if (e && typeof e === "object" && "message" in e) {
+        message = (e as any).message || message;
+      }
+      Alert.alert("Hata", message);
     } finally {
       setSubmitting(false);
     }
