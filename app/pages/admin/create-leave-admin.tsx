@@ -200,6 +200,11 @@ export default function CreateLeaveAdminScreen() {
     if (!courseCode.trim()) return Alert.alert("Hata", "Ders kodu girin");
     if (!replacedLecturer)
       return Alert.alert("Hata", "Yerine gelen hocayı seçin");
+    if (replacedLecturer.id === selectedUser.id)
+      return Alert.alert(
+        "Hata",
+        "Seçilen kullanıcı ile yerine gelen hoca aynı olamaz!"
+      );
     if (!reason.trim()) return Alert.alert("Hata", "İzin nedeni girin");
     setSubmitting(true);
     try {
@@ -516,6 +521,7 @@ export default function CreateLeaveAdminScreen() {
               .filter(
                 (user) =>
                   user.id !== currentAdminId &&
+                  (!selectedUser || user.id !== selectedUser.id) &&
                   (lecturerSearchQuery.trim() === "" ||
                     user.full_name
                       .toLowerCase()
