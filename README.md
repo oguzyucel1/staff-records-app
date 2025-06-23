@@ -1,50 +1,128 @@
-# Welcome to your Expo app 👋
+# 📲 StaffApp - Personel Giriş/Çıkış ve İzin Takip Sistemi
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
-## Get started
+![StaffApp Logo](./assets/images/appicon.png)
 
-1. Install dependencies
+**StaffApp**, kurum personelinin günlük giriş/çıkış işlemlerini QR kod ile dijital olarak kayıt altına alan ve izin/ders doldurma taleplerini yöneten mobil uygulamadır. Hem kullanıcılar (personeller) hem de yöneticiler (admin) için optimize edilmiş iki ayrı panel içerir.
 
-   ```bash
-   npm install
-   ```
+---
 
-2. Start the app
+## 🧱 Tech Stack
 
-   ```bash
-   npx expo start
-   ```
+![React Native](https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Expo](https://img.shields.io/badge/Expo-000000?style=for-the-badge&logo=expo&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-3FCF8E?style=for-the-badge&logo=supabase&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=for-the-badge&logo=postgresql&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![EAS Build](https://img.shields.io/badge/EAS_Build-4630EB?style=for-the-badge&logo=expo&logoColor=white)
 
-In the output, you'll find options to open the app in a
+---
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## 🚀 Özellikler
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- ✅ **QR Kod ile Giriş/Çıkış Takibi**
+  - Her gün yöneticinin oluşturduğu QR kod ile personel, giriş/çıkış yapar.
+  - Tüm loglar tarih ve saat bilgisiyle kaydedilir.
 
-## Get a fresh project
+- 📅 **İzin ve Ders Doldurma Modülü**
+  - Personel izin talebi gönderir.
+  - Yönetici, izin saatinde dersi kimin devralacağını manuel girer.
 
-When you're ready, run:
+- 🔒 **Gerçek Zamanlı Supabase Entegrasyonu**
+  - Tüm veriler Supabase Postgres veritabanında tutulur.
+  - Gerçek zamanlı kayıt ve admin panelinde anında görüntüleme.
 
-```bash
-npm run reset-project
+- 🌗 **Modern ve Şık Arayüz**
+  - React Native + Expo ile geliştirildi.
+  - iOS ve Android desteği.
+
+---
+
+## 🛠️ Teknolojiler
+
+| Katman       | Teknoloji                     |
+|--------------|-------------------------------|
+| Mobil        | React Native + Expo           |
+| Backend      | Supabase (Auth, DB, Storage)  |
+| State        | React Hooks + Context         |
+| Build        | EAS Build / OTA Updates       |
+| Veritabanı   | PostgreSQL (Supabase)         |
+| QR / Kamera  | Expo Camera & QR Scanner      |
+
+---
+
+## 🏗️ Proje Yapısı (YAML Formatında)
+
+```
+staffapp/
+  app/: # Sayfa ve yönlendirme sistemi (expo-router)
+  assets/: # Uygulama ikonları, splash ekranı, arka plan görselleri
+  lib/:
+    supabase.ts: # Supabase client ve auth yapılandırması
+  components/: # Özel oluşturulmuş component'lar
+  .env: # Supabase URL ve Anon Key ortam değişkenleri
+  app.config.js: # Expo yapılandırması, EAS için ortam değişkenleri okunur
+  eas.json: # Build ortamları (development, preview, production) yapılandırması
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## 🔐 Güvenlik
 
-## Learn more
+- Supabase projesinde **Row Level Security (RLS)** aktif .
+- Giriş/çıkış ve izin loglarında **yalnızca yetkili kullanıcılar** işlem yapabilir.
+- `.env` dosyası build'e **gömülmez**, yalnızca `EXPO_PUBLIC_` prefix'li environment değişkenleri uygulamaya alınır.
 
-To learn more about developing your project with Expo, look at the following resources:
+---
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## 👥 Katkı Sağlamak
 
-## Join the community
+✨ Pull request ve katkılara açığız!
 
-Join our community of developers creating universal apps.
+- Öneri, hata bildirimi veya geliştirme için **issue açabilirsin**.
+- Lütfen açıklayıcı commit mesajları kullan ve mümkünse ekran görüntüsü ekle.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+---
+## 📸 Ekran Görüntüleri
+
+Aşağıda uygulamanın bazı temel ekran görüntüleri yer almaktadır:
+
+### 🔐 Giriş Ekranı
+Kullanıcıların uygulamaya erişim sağladığı basit ve güvenli giriş arayüzü.
+
+![Giriş Ekranı](./assets/screenshots/login.png)
+
+---
+
+### 📷 Ana Sayfa
+Admin'in bütün istatistikleri görebildiği ve yönetimlere erişebildiği arayüz.
+
+![Ana Sayfa](./assets/screenshots/admin.png)
+
+---
+
+### 🧑‍💼 Admin Paneli
+Yöneticilerin günlük QR kod oluşturduğu, giriş/çıkışları ve izinleri görüntülediği panel.
+
+![Admin Panel](./assets/screenshots/ap1.png)
+
+---
+
+### 📝 İzin Talep Formu
+Personellerin ders saati ve neden belirterek izin başvurusunda bulunduğu ekran.
+
+![İzin Talep Ekranı](./assets/screenshots/izin.png)
+
+---
+
+### 📊 Kayıt Listesi
+Tarih ve personele göre filtrelenmiş giriş/çıkış kayıtlarının görüntülendiği log ekranı.
+
+![Kayıt Listesi](./assets/screenshots/kayıt.png)
+
+---
+
+### 📊 Kullanıcı Ekranı
+Kullanıcıların izin durumlarını görüntülediği ve karekodlarını okutabildiği arayüz.
+
+![Kullanıcı Ekranı](./assets/screenshots/userhome.png)
+
+
