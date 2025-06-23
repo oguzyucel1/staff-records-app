@@ -2,7 +2,8 @@ export type NotificationType =
   | "leave_approved"
   | "leave_rejected"
   | "attendance_reminder"
-  | "system_notification";
+  | "system_notification"
+  | "course_assignment";
 
 export interface Notification {
   id: string;

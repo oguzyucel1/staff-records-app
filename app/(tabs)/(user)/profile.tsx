@@ -17,6 +17,7 @@ import { supabase } from "../../../lib/supabase";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNotifications } from "../../../hooks/useNotifications";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function UserProfileScreen() {
   const [profile, setProfile] = useState<{
@@ -24,6 +25,7 @@ export default function UserProfileScreen() {
     email: string;
     role: string;
     department?: string;
+    password_changed: boolean;
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
@@ -67,6 +69,12 @@ export default function UserProfileScreen() {
     initializePage();
   }, []);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchUserProfile();
+    }, [])
+  );
+
   const checkUserRole = async () => {
     try {
       const {
@@ -82,13 +90,14 @@ export default function UserProfileScreen() {
 
       const { data: userProfile } = await supabase
         .from("profiles")
-        .select("role, full_name, email, department")
+        .select("role, full_name, email, department, password_changed")
         .eq("id", user.id)
         .single();
 
       if (userProfile?.role === "admin") {
         router.replace("/(tabs)/(admin)/home");
       }
+      setProfile(userProfile);
     } catch (error) {
       console.error("Error checking user role:", error);
       router.replace("/auth/login");
@@ -104,7 +113,7 @@ export default function UserProfileScreen() {
 
       const { data: userProfile, error } = await supabase
         .from("profiles")
-        .select("full_name, email, role, department")
+        .select("full_name, email, role, department, password_changed")
         .eq("id", authUser.id)
         .single();
 
@@ -233,19 +242,56 @@ export default function UserProfileScreen() {
       >
         <Text style={styles.sectionTitle}>Hesap Ayarları</Text>
         <View style={styles.settingsContainer}>
-          <TouchableOpacity
-            style={styles.settingItem}
-            onPress={() => router.push("/pages/user/change-password")}
-          >
-            <Ionicons name="key-outline" size={24} color="#2193b0" />
-            <Text style={styles.settingText}>Şifreyi Değiştir</Text>
-            <Ionicons
-              name="chevron-forward"
-              size={20}
-              color="#999"
-              style={styles.settingArrow}
-            />
-          </TouchableOpacity>
+          <View style={{ marginBottom: 2 }}>
+            <TouchableOpacity
+              style={styles.settingItem}
+              onPress={() => router.push("/pages/user/change-password")}
+            >
+              <Ionicons name="key-outline" size={24} color="#2193b0" />
+              <Text style={styles.settingText}>Şifreyi Değiştir</Text>
+              <Ionicons
+                name="chevron-forward"
+                size={20}
+                color="#999"
+                style={styles.settingArrow}
+              />
+            </TouchableOpacity>
+            {profile && profile.password_changed === false && (
+              <View
+                style={{
+                  backgroundColor: "#fff3cd",
+                  borderBottomLeftRadius: 12,
+                  borderBottomRightRadius: 12,
+                  padding: 10,
+                  borderWidth: 1,
+                  borderTopWidth: 0,
+                  borderColor: "#ffeeba",
+                  borderTopColor: "transparent",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginTop: -2,
+                }}
+              >
+                <Ionicons
+                  name="warning-outline"
+                  size={18}
+                  color="#856404"
+                  style={{ marginRight: 8 }}
+                />
+                <Text
+                  style={{
+                    color: "#856404",
+                    fontWeight: "bold",
+                    fontSize: 13,
+                    flex: 1,
+                    textAlign: "center",
+                  }}
+                >
+                  Lütfen güvenliğiniz için şifrenizi değiştirin!
+                </Text>
+              </View>
+            )}
+          </View>
 
           <TouchableOpacity
             style={styles.settingItem}

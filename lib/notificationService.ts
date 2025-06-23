@@ -56,6 +56,29 @@ export class NotificationService {
     });
   }
 
+  static async createCourseAssignmentNotification(
+    replacedLecturerId: string,
+    leaveRequestId: string,
+    courseCode: string,
+    startDate: string,
+    endDate: string,
+    startTime: string,
+    endTime: string
+  ) {
+    const type: NotificationType = "course_assignment";
+    const title = "Derse Atandınız";
+    const message = `${courseCode} dersi için ${startDate} - ${endDate} tarihleri arası ${startTime}-${endTime} saatlerinde görevlendirildiniz.`;
+
+    return this.createNotification(replacedLecturerId, type, title, message, {
+      leave_request_id: leaveRequestId,
+      course_code: courseCode,
+      start_date: startDate,
+      end_date: endDate,
+      start_time: startTime,
+      end_time: endTime,
+    });
+  }
+
   static async getNotificationCount(userId: string) {
     try {
       const { count, error } = await supabase

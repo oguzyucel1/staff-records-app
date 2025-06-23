@@ -18,12 +18,26 @@ import { useFocusEffect } from "expo-router";
 export default function AllLeavesScreen() {
   const [leaveRequests, setLeaveRequests] = useState<LeaveRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [profiles, setProfiles] = useState<any[]>([]);
 
   useFocusEffect(
     React.useCallback(() => {
       fetchAllLeaveRequests();
+      fetchAllProfiles();
     }, [])
   );
+
+  const fetchAllProfiles = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, full_name, email, department");
+      if (error) throw error;
+      setProfiles(data || []);
+    } catch (error) {
+      setProfiles([]);
+    }
+  };
 
   const fetchAllLeaveRequests = async () => {
     try {
@@ -39,13 +53,7 @@ export default function AllLeavesScreen() {
       console.log("Fetching all leave requests for user:", user.id);
       const { data, error } = await supabase
         .from("leave_requests")
-        .select(
-          `
-          *,
-          profiles:user_id (full_name, email, department),
-          replaced_lecturer_profile:replaced_lecturer (full_name, email, department)
-        `
-        )
+        .select(`*, profiles:user_id (full_name, email, department)`)
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
@@ -86,9 +94,51 @@ export default function AllLeavesScreen() {
           </View>
         ) : leaveRequests.length > 0 ? (
           <View style={styles.leaveList}>
-            {leaveRequests.map((request) => (
-              <LeaveRequestCard key={request.id} request={request} />
-            ))}
+            {leaveRequests.map((request) => {
+              const replacedLecturer =
+                request.is_created_by_admin && request.replaced_lecturer
+                  ? profiles.find((p) => p.id === request.replaced_lecturer)
+                  : null;
+              return (
+                <React.Fragment key={request.id}>
+                  <LeaveRequestCard request={request} />
+                  {request.is_created_by_admin && replacedLecturer && (
+                    <View
+                      style={{
+                        backgroundColor: "#f8f9fa",
+                        borderRadius: 12,
+                        padding: 14,
+                        marginBottom: 12,
+                        marginTop: -8,
+                        marginLeft: 8,
+                        marginRight: 8,
+                        borderWidth: 1,
+                        borderColor: "#e9ecef",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontWeight: "bold",
+                          color: "#4a00e0",
+                          marginBottom: 4,
+                        }}
+                      >
+                        Yerine Görevli Hoca
+                      </Text>
+                      <Text style={{ fontSize: 15, color: "#333" }}>
+                        {replacedLecturer.full_name}
+                      </Text>
+                      <Text style={{ fontSize: 13, color: "#666" }}>
+                        {replacedLecturer.email}
+                      </Text>
+                      <Text style={{ fontSize: 13, color: "#999" }}>
+                        {replacedLecturer.department}
+                      </Text>
+                    </View>
+                  )}
+                </React.Fragment>
+              );
+            })}
           </View>
         ) : (
           <View style={styles.emptyContainer}>

@@ -103,6 +103,8 @@ export default function NotificationsPage() {
         return { name: "close-circle", color: "#F44336" };
       case "attendance_reminder":
         return { name: "time", color: "#FF9800" };
+      case "course_assignment":
+        return { name: "school", color: "#6c5ce7" };
       default:
         return { name: "notifications", color: "#2196F3" };
     }

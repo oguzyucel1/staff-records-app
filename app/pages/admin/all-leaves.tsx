@@ -17,15 +17,29 @@ export default function AllLeaves() {
   const [leaveRequests, setLeaveRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const fadeAnim = useState(new Animated.Value(0))[0];
+  const [profiles, setProfiles] = useState<any[]>([]);
 
   useEffect(() => {
     fetchAllLeaves();
+    fetchAllProfiles();
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 500,
       useNativeDriver: true,
     }).start();
   }, []);
+
+  const fetchAllProfiles = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, full_name, email, department");
+      if (error) throw error;
+      setProfiles(data || []);
+    } catch (error) {
+      setProfiles([]);
+    }
+  };
 
   const fetchAllLeaves = async () => {
     try {
@@ -79,57 +93,109 @@ export default function AllLeaves() {
             <Text style={styles.loadingText}>Tüm izinler yükleniyor...</Text>
           </View>
         ) : leaveRequests.length > 0 ? (
-          leaveRequests.map((req) => (
-            <View key={req.id} style={styles.card}>
-              <View style={styles.cardHeader}>
-                <Ionicons name="person-circle" size={36} color="#4a00e0" />
-                <View style={{ flex: 1, marginLeft: 12 }}>
-                  <Text style={styles.name}>
-                    {req.profiles?.full_name || "-"}
-                  </Text>
-                  <Text style={styles.email}>{req.profiles?.email || "-"}</Text>
-                  <Text style={styles.department}>
-                    {req.profiles?.department || "-"}
-                  </Text>
+          leaveRequests.map((req) => {
+            const replacedLecturer =
+              req.is_created_by_admin && req.replaced_lecturer
+                ? profiles.find((p) => p.id === req.replaced_lecturer)
+                : null;
+            return (
+              <React.Fragment key={req.id}>
+                <View style={styles.card}>
+                  <View style={styles.cardHeader}>
+                    <Ionicons name="person-circle" size={36} color="#4a00e0" />
+                    <View style={{ flex: 1, marginLeft: 12 }}>
+                      <Text style={styles.name}>
+                        {req.profiles?.full_name || "-"}
+                      </Text>
+                      <Text style={styles.email}>
+                        {req.profiles?.email || "-"}
+                      </Text>
+                      <Text style={styles.department}>
+                        {req.profiles?.department || "-"}
+                      </Text>
+                    </View>
+                    <View
+                      style={[
+                        styles.statusBadge,
+                        req.is_created_by_admin
+                          ? { backgroundColor: "#6c5ce7" }
+                          : {
+                              backgroundColor:
+                                statusColors[req.status] || "#ccc",
+                            },
+                      ]}
+                    >
+                      <Text style={styles.statusBadgeText}>
+                        {req.is_created_by_admin
+                          ? "Yönetici"
+                          : statusLabels[req.status] || req.status}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.cardBody}>
+                    <View style={styles.row}>
+                      <Ionicons
+                        name="calendar-outline"
+                        size={18}
+                        color="#8e2de2"
+                      />
+                      <Text style={styles.bodyText}>
+                        {new Date(req.start_date).toLocaleDateString("tr-TR")} -{" "}
+                        {new Date(req.end_date).toLocaleDateString("tr-TR")}
+                      </Text>
+                    </View>
+                    <View style={styles.row}>
+                      <Ionicons
+                        name="document-text-outline"
+                        size={18}
+                        color="#8e2de2"
+                      />
+                      <Text style={styles.bodyText}>{req.leave_type}</Text>
+                    </View>
+                    <View style={styles.row}>
+                      <Ionicons
+                        name="chatbubble-ellipses-outline"
+                        size={18}
+                        color="#8e2de2"
+                      />
+                      <Text style={styles.bodyText}>{req.reason}</Text>
+                    </View>
+                    {req.is_created_by_admin && replacedLecturer && (
+                      <View
+                        style={{
+                          backgroundColor: "#f8f9fa",
+                          borderRadius: 12,
+                          padding: 14,
+                          marginTop: 10,
+                          borderWidth: 1,
+                          borderColor: "#e9ecef",
+                        }}
+                      >
+                        <Text
+                          style={{
+                            fontWeight: "bold",
+                            color: "#4a00e0",
+                            marginBottom: 4,
+                          }}
+                        >
+                          Yerine Görevli Hoca
+                        </Text>
+                        <Text style={{ fontSize: 15, color: "#333" }}>
+                          {replacedLecturer.full_name}
+                        </Text>
+                        <Text style={{ fontSize: 13, color: "#666" }}>
+                          {replacedLecturer.email}
+                        </Text>
+                        <Text style={{ fontSize: 13, color: "#999" }}>
+                          {replacedLecturer.department}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
                 </View>
-                <View
-                  style={[
-                    styles.statusBadge,
-                    { backgroundColor: statusColors[req.status] || "#ccc" },
-                  ]}
-                >
-                  <Text style={styles.statusBadgeText}>
-                    {statusLabels[req.status] || req.status}
-                  </Text>
-                </View>
-              </View>
-              <View style={styles.cardBody}>
-                <View style={styles.row}>
-                  <Ionicons name="calendar-outline" size={18} color="#8e2de2" />
-                  <Text style={styles.bodyText}>
-                    {new Date(req.start_date).toLocaleDateString("tr-TR")} -{" "}
-                    {new Date(req.end_date).toLocaleDateString("tr-TR")}
-                  </Text>
-                </View>
-                <View style={styles.row}>
-                  <Ionicons
-                    name="document-text-outline"
-                    size={18}
-                    color="#8e2de2"
-                  />
-                  <Text style={styles.bodyText}>{req.leave_type}</Text>
-                </View>
-                <View style={styles.row}>
-                  <Ionicons
-                    name="chatbubble-ellipses-outline"
-                    size={18}
-                    color="#8e2de2"
-                  />
-                  <Text style={styles.bodyText}>{req.reason}</Text>
-                </View>
-              </View>
-            </View>
-          ))
+              </React.Fragment>
+            );
+          })
         ) : (
           <View style={styles.emptyContainer}>
             <Ionicons name="cloud-offline-outline" size={48} color="#aaa" />

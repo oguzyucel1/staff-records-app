@@ -24,8 +24,14 @@ export default {
       },
       edgeToEdgeEnabled: true,
       softwareKeyboardLayoutMode: "pan",
-      permissions: ["android.permission.CAMERA"],
+      permissions: [
+        "android.permission.CAMERA",
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.VIBRATE",
+        "android.permission.WAKE_LOCK",
+      ],
       package: "com.oguzyucel1.staffapp",
+      googleServicesFile: "./google-services.json",
     },
 
     web: {
@@ -42,7 +48,17 @@ export default {
 
     assetBundlePatterns: ["**/*"],
 
-    plugins: ["expo-router"],
+    plugins: [
+      "expo-router",
+      [
+        "expo-notifications",
+        {
+          icon: "./assets/images/notification-icon.png",
+          color: "#4c669f",
+          sounds: ["./assets/sounds/notification.wav"],
+        },
+      ],
+    ],
 
     experiments: {
       typedRoutes: true,
@@ -55,9 +71,6 @@ export default {
       router: {},
       supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL,
       supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
-      emailjsServiceId: process.env.EXPO_PUBLIC_EMAILJS_SERVICE_ID,
-      emailjsTemplateId: process.env.EXPO_PUBLIC_EMAILJS_TEMPLATE_ID,
-      emailjsPublicKey: process.env.EXPO_PUBLIC_EMAILJS_PUBLIC_KEY,
       eas: {
         projectId: "a854bbcb-c183-43e9-b492-6a5d0bb913dc",
       },

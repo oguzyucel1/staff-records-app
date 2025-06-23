@@ -13,7 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { supabase } from "../../../lib/supabase";
-import LeaveRequestCard from "../../components/LeaveRequestCard";
+import LeaveRequestCard from "../../../components/LeaveRequestCard";
 import { LeaveRequest } from "../../../types/leave";
 import { NotificationService } from "../../../lib/notificationService";
 

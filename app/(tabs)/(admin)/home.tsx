@@ -42,6 +42,14 @@ export default function AdminHomeScreen() {
     full_name: string;
   } | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [form, setForm] = useState({
+    full_name: "",
+    department: "",
+    phone: "",
+    email: "",
+    role: "user",
+    password: "12345678",
+  });
 
   useEffect(() => {
     const initializePage = async () => {
@@ -310,13 +318,16 @@ export default function AdminHomeScreen() {
                 <Text style={styles.actionButtonText}>İzin Oluştur</Text>
               </LinearGradient>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.actionButton}>
+            <TouchableOpacity
+              style={styles.actionButton}
+              onPress={() => router.push("/pages/admin/add-user")}
+            >
               <LinearGradient
-                colors={["#4CAF50", "#45a049"]}
+                colors={["#1976D2", "#64B5F6"]}
                 style={styles.actionButtonGradient}
               >
-                <Ionicons name="settings-outline" size={28} color="#fff" />
-                <Text style={styles.actionButtonText}>Ayarlar</Text>
+                <Ionicons name="person-add-outline" size={28} color="#fff" />
+                <Text style={styles.actionButtonText}>Kullanıcı Ekle</Text>
               </LinearGradient>
             </TouchableOpacity>
           </View>

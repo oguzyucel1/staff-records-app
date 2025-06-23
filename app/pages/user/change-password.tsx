@@ -17,6 +17,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { supabase } from "../../../lib/supabase";
 import { LinearGradient } from "expo-linear-gradient";
+import Constants from "expo-constants";
 
 const { width } = Dimensions.get("window");
 
@@ -117,6 +118,18 @@ export default function ChangePasswordPage() {
     try {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
+
+      // Şifre değiştiyse burada güncelle:
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) {
+        await supabase
+          .from("profiles")
+          .update({ password_changed: true })
+          .eq("id", user.id);
+      }
+
       Alert.alert("Başarılı", "Şifreniz başarılı bir şekilde değiştirildi.", [
         { text: "Tamam", onPress: () => router.back() },
       ]);

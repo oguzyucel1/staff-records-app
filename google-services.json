@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "26821193142",
+    "project_id": "staffapp-237af",
+    "storage_bucket": "staffapp-237af.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:26821193142:android:d565de0c921f956fa42517",
+        "android_client_info": {
+          "package_name": "com.oguzyucel1.staffapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB4imr37s8uLkk94o0hHrahxHIJ3Ta3KDk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

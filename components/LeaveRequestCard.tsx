@@ -20,8 +20,14 @@ const statusColors: Record<string, { bg: string; text: string }> = {
 
 export default function LeaveRequestCard({
   request,
+  showActions = false,
+  onApprove,
+  onReject,
 }: {
   request: LeaveRequest;
+  showActions?: boolean;
+  onApprove?: () => void;
+  onReject?: () => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const [animation] = useState(new Animated.Value(0));
@@ -45,23 +51,20 @@ export default function LeaveRequestCard({
 
   return (
     <View style={styles.card}>
-      {/* Status badge absolute */}
-      <View style={[styles.statusBadge, { backgroundColor: statusColor.bg }]}>
-        <Text style={[styles.statusText, { color: statusColor.text }]}>
-          {status === "approved"
-            ? "Onaylandı"
-            : status === "pending"
-              ? "Bekliyor"
-              : "Reddedildi"}
-        </Text>
-      </View>
-
-      {/* Admin badge if created by admin */}
-      {request.is_created_by_admin && (
-        <View
-          style={[styles.statusBadge, { backgroundColor: "#6c5ce7", top: 40 }]}
-        >
-          <Text style={[styles.statusText, { color: "#fff" }]}>Admin</Text>
+      {/* Status badge: show only 'Yönetici' if admin-created, otherwise show status */}
+      {request.is_created_by_admin ? (
+        <View style={[styles.statusBadge, { backgroundColor: "#6c5ce7" }]}>
+          <Text style={[styles.statusText, { color: "#fff" }]}>Yönetici</Text>
+        </View>
+      ) : (
+        <View style={[styles.statusBadge, { backgroundColor: statusColor.bg }]}>
+          <Text style={[styles.statusText, { color: statusColor.text }]}>
+            {status === "approved"
+              ? "Onaylandı"
+              : status === "pending"
+                ? "Bekliyor"
+                : "Reddedildi"}
+          </Text>
         </View>
       )}
 
@@ -92,7 +95,10 @@ export default function LeaveRequestCard({
           {
             maxHeight: animation.interpolate({
               inputRange: [0, 1],
-              outputRange: [0, request.is_created_by_admin ? 220 : 160],
+              outputRange: [
+                0,
+                request.is_created_by_admin ? 220 : showActions ? 260 : 160,
+              ],
             }),
             opacity: animation,
             paddingVertical: expanded ? 14 : 0,
@@ -182,6 +188,50 @@ export default function LeaveRequestCard({
               />
               <Text style={styles.detailText}>{request.reason}</Text>
             </View>
+            {/* Approve/Reject Actions */}
+            {showActions &&
+              !request.is_created_by_admin &&
+              (onApprove || onReject) && (
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "flex-end",
+                    gap: 12,
+                    marginTop: 10,
+                  }}
+                >
+                  {onReject && (
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: "#e53935",
+                        borderRadius: 8,
+                        paddingVertical: 8,
+                        paddingHorizontal: 18,
+                      }}
+                      onPress={onReject}
+                    >
+                      <Text style={{ color: "#fff", fontWeight: "bold" }}>
+                        Reddet
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                  {onApprove && (
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: "#4CAF50",
+                        borderRadius: 8,
+                        paddingVertical: 8,
+                        paddingHorizontal: 18,
+                      }}
+                      onPress={onApprove}
+                    >
+                      <Text style={{ color: "#fff", fontWeight: "bold" }}>
+                        Onayla
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              )}
           </>
         )}
       </Animated.View>

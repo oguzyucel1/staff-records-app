@@ -140,9 +140,15 @@ export default function AddUserPage() {
         phone: "",
         email: "",
         role: "user",
-        password: "",
+        password: "12345678",
       });
       router.back();
+
+      // Şifre değiştir fonksiyonunda
+      await supabase
+        .from("profiles")
+        .update({ password_changed: true })
+        .eq("id", result.id);
     } catch (err: any) {
       setError(err.message || "İşlem başarısız.");
     } finally {

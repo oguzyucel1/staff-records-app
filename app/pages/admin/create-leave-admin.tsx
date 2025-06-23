@@ -244,19 +244,14 @@ export default function CreateLeaveAdminScreen() {
           true
         );
         // Yerine gelen hocaya bildirim
-        await NotificationService.createNotification(
+        await NotificationService.createCourseAssignmentNotification(
           replacedLecturer.id,
-          "leave_approved",
-          "Ders Temsilciliği",
-          `${selectedUser.full_name} (${courseCode}) dersi için ${formatDate(startDate)} - ${formatDate(endDate)} arası yerine siz görevlendirildiniz!`,
-          {
-            leave_request_id: leaveRequestId,
-            leave_type: "yönetici izni",
-            start_date: startDate.toISOString().split("T")[0],
-            end_date: endDate.toISOString().split("T")[0],
-            replaced_for: selectedUser.id,
-            course_code: courseCode.trim(),
-          }
+          leaveRequestId,
+          courseCode.trim(),
+          startDate.toISOString().split("T")[0],
+          endDate.toISOString().split("T")[0],
+          startTime,
+          endTime
         );
       }
       Alert.alert(

@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS public.notifications (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-    type TEXT NOT NULL CHECK (type IN ('leave_approved', 'leave_rejected', 'attendance_reminder', 'system_notification')),
+    type TEXT NOT NULL CHECK (type IN ('leave_approved', 'leave_rejected', 'attendance_reminder', 'system_notification', 'course_assignment')),
     title TEXT NOT NULL,
     message TEXT NOT NULL,
     data JSONB,

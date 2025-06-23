@@ -12,6 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { supabase } from "../../../lib/supabase";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function UserHomeScreen() {
   const router = useRouter();
@@ -58,6 +59,12 @@ export default function UserHomeScreen() {
     initializePage();
   }, []);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchUserProfile();
+    }, [])
+  );
+
   const checkUserRole = async () => {
     try {
       const {
@@ -94,7 +101,7 @@ export default function UserHomeScreen() {
       if (user) {
         const { data, error } = await supabase
           .from("profiles")
-          .select("full_name, email, role")
+          .select("full_name, email, role, password_changed")
           .eq("id", user.id)
           .single();
         if (error) throw error;

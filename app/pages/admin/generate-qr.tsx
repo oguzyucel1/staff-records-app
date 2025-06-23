@@ -20,6 +20,16 @@ import { supabase } from "../../../lib/supabase";
 
 const CALENDAR_HEIGHT = 370;
 
+function getTodayStrTR() {
+  const now = new Date();
+  // Türkiye saatine göre offset (UTC+3)
+  const trOffset = 3 * 60; // dakika
+  const local = new Date(
+    now.getTime() + (trOffset - now.getTimezoneOffset()) * 60000
+  );
+  return local.toISOString().split("T")[0];
+}
+
 export default function GenerateQR() {
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -40,8 +50,7 @@ export default function GenerateQR() {
     const fetchTodayQr = async () => {
       setLoading(true);
       setFetchError(null);
-      const today = new Date();
-      const todayStr = today.toISOString().split("T")[0];
+      const todayStr = getTodayStrTR();
       const { data, error } = await supabase
         .from("qr_codes")
         .select("id, date")
