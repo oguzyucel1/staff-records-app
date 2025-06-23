@@ -18,7 +18,7 @@ import { supabase } from "../../../lib/supabase";
 import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { Calendar } from "react-native-calendars";
-import { LeaveRequest } from "../../../types/leave";
+import { MaskedTextInput } from "react-native-mask-text";
 
 interface UserProfile {
   id: string;
@@ -28,6 +28,7 @@ interface UserProfile {
 }
 
 export default function CreateLeaveAdminScreen() {
+  // Kullanıcı seçimleri
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<UserProfile[]>([]);
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
@@ -42,18 +43,16 @@ export default function CreateLeaveAdminScreen() {
   const [lecturerSearchQuery, setLecturerSearchQuery] = useState("");
   const [currentAdminId, setCurrentAdminId] = useState<string | null>(null);
 
-  // Form fields
+  // Form alanları
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
-  const [startTime, setStartTime] = useState(new Date());
-  const [endTime, setEndTime] = useState(new Date());
-  const [courseCode, setCourseCode] = useState("");
-  const [reason, setReason] = useState("");
-
-  // Calendar states
   const [showCalendar, setShowCalendar] = useState(false);
   const [calendarMode, setCalendarMode] = useState<"start" | "end">("start");
   const [markedDates, setMarkedDates] = useState({});
+  const [startTimeRaw, setStartTimeRaw] = useState("");
+  const [endTimeRaw, setEndTimeRaw] = useState("");
+  const [courseCode, setCourseCode] = useState("");
+  const [reason, setReason] = useState("");
   const fadeAnim = useState(new Animated.Value(0))[0];
 
   const today = new Date();
@@ -84,37 +83,34 @@ export default function CreateLeaveAdminScreen() {
 
   const fetchUsers = async () => {
     try {
-      // Get current admin user first
+      // Admini bul
       const {
         data: { user: adminUser },
       } = await supabase.auth.getUser();
-
       if (!adminUser) {
         Alert.alert("Hata", "Oturum bilgisi bulunamadı.");
         return;
       }
-
+      setCurrentAdminId(adminUser.id);
+      // Admin hariç tüm kullanıcılar
       const { data, error } = await supabase
         .from("profiles")
         .select("id, full_name, email, department")
-        .neq("id", adminUser.id) // Exclude current admin user
+        .neq("id", adminUser.id)
         .order("full_name");
-
       if (error) throw error;
       setUsers(data || []);
       setFilteredUsers(data || []);
-      setCurrentAdminId(adminUser.id);
     } catch (error) {
-      console.error("Error fetching users:", error);
       Alert.alert("Hata", "Kullanıcılar yüklenirken bir hata oluştu.");
     } finally {
       setLoading(false);
     }
   };
 
+  // Takvim fonksiyonları
   const handleDateSelect = (date: string) => {
     const selectedDate = new Date(date);
-
     if (calendarMode === "start") {
       setStartDate(selectedDate);
       setCalendarMode("end");
@@ -129,10 +125,8 @@ export default function CreateLeaveAdminScreen() {
       setShowCalendar(false);
     }
   };
-
   const updateMarkedDates = (start: Date | null, end: Date | null) => {
     if (!start) return;
-
     const marked: any = {
       [start.toISOString().split("T")[0]]: {
         selected: true,
@@ -140,15 +134,12 @@ export default function CreateLeaveAdminScreen() {
         color: "#4a00e0",
       },
     };
-
     if (end) {
       marked[end.toISOString().split("T")[0]] = {
         selected: true,
         endingDay: true,
         color: "#4a00e0",
       };
-
-      // Aradaki günleri işaretle
       const current = new Date(start);
       while (current < end) {
         current.setDate(current.getDate() + 1);
@@ -161,101 +152,82 @@ export default function CreateLeaveAdminScreen() {
         }
       }
     }
-
     setMarkedDates(marked);
   };
 
+  // Saat inputları (maskeli)
+  const formatTimeMasked = (digits: string) => {
+    const padded = (digits + "----").slice(0, 4);
+    return padded.slice(0, 2) + ":" + padded.slice(2, 4);
+  };
+
+  const handleTimeMaskedInput = (text: string, type: "start" | "end") => {
+    const digits = text.replace(/\D/g, "").slice(0, 4);
+    if (type === "start") setStartTimeRaw(digits);
+    else setEndTimeRaw(digits);
+  };
+
+  // Kullanıcı seçimi
   const selectUser = (user: UserProfile) => {
     setSelectedUser(user);
     setShowUserModal(false);
     setSearchQuery("");
   };
-
+  // Hoca seçimi
   const selectLecturer = (user: UserProfile) => {
     setReplacedLecturer(user);
     setShowLecturerModal(false);
     setLecturerSearchQuery("");
   };
-
+  // Tarih formatı
   const formatDate = (date: Date | null) => {
     if (!date) return "Tarih seçin";
     return date.toLocaleDateString("tr-TR");
   };
 
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString("tr-TR", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
+  // Kayıt
   const handleSubmit = async () => {
-    if (!selectedUser) {
-      Alert.alert("Hata", "Lütfen bir kullanıcı seçin.");
-      return;
-    }
-
-    if (!startDate || !endDate) {
-      Alert.alert("Hata", "Lütfen başlangıç ve bitiş tarihlerini seçin.");
-      return;
-    }
-
-    if (!courseCode.trim()) {
-      Alert.alert("Hata", "Lütfen ders kodunu girin.");
-      return;
-    }
-
-    if (!replacedLecturer) {
-      Alert.alert("Hata", "Lütfen yerine gelecek hocayı seçin.");
-      return;
-    }
-
-    if (!reason.trim()) {
-      Alert.alert("Hata", "Lütfen izin nedenini girin.");
-      return;
-    }
-
+    if (!selectedUser) return Alert.alert("Hata", "Kullanıcı seçin");
+    if (!startDate || !endDate) return Alert.alert("Hata", "Tarih seçin");
+    if (startTimeRaw.length !== 4 || endTimeRaw.length !== 4)
+      return Alert.alert("Hata", "Saat girin (örn: 09:00)");
+    const startTime = startTimeRaw.slice(0, 2) + ":" + startTimeRaw.slice(2, 4);
+    const endTime = endTimeRaw.slice(0, 2) + ":" + endTimeRaw.slice(2, 4);
+    if (!/^([0-1]\d|2[0-3]):([0-5]\d)$/.test(startTime))
+      return Alert.alert("Hata", "Başlangıç saati geçersiz. (örn: 09:00)");
+    if (!/^([0-1]\d|2[0-3]):([0-5]\d)$/.test(endTime))
+      return Alert.alert("Hata", "Bitiş saati geçersiz. (örn: 17:00)");
+    if (!courseCode.trim()) return Alert.alert("Hata", "Ders kodu girin");
+    if (!replacedLecturer)
+      return Alert.alert("Hata", "Yerine gelen hocayı seçin");
+    if (!reason.trim()) return Alert.alert("Hata", "İzin nedeni girin");
     setSubmitting(true);
-
     try {
       const {
         data: { user: adminUser },
       } = await supabase.auth.getUser();
-
-      if (!adminUser) {
-        Alert.alert("Hata", "Oturum bilgisi bulunamadı.");
-        return;
-      }
-
+      if (!adminUser) throw new Error("Oturum bulunamadı");
       const { error } = await supabase.from("leave_requests").insert({
         user_id: selectedUser.id,
         start_date: startDate.toISOString().split("T")[0],
         end_date: endDate.toISOString().split("T")[0],
-        start_time: startTime.toTimeString().split(" ")[0],
-        end_time: endTime.toTimeString().split(" ")[0],
+        start_time: startTime,
+        end_time: endTime,
         course_code: courseCode.trim(),
         replaced_lecturer: replacedLecturer.id,
         reason: reason.trim(),
-        status: "approved", // Admin oluşturduğu için otomatik onaylı
+        status: "approved",
         is_created_by_admin: true,
         created_by: adminUser.id,
       });
-
       if (error) throw error;
-
       Alert.alert(
         "Başarılı",
-        `${selectedUser.full_name} için izin talebi başarıyla oluşturuldu.`,
-        [
-          {
-            text: "Tamam",
-            onPress: () => router.back(),
-          },
-        ]
+        `${selectedUser.full_name} için izin oluşturuldu!`,
+        [{ text: "Tamam", onPress: () => router.back() }]
       );
-    } catch (error) {
-      console.error("Error creating leave request:", error);
-      Alert.alert("Hata", "İzin talebi oluşturulurken bir hata oluştu.");
+    } catch (e) {
+      Alert.alert("Hata", "Kayıt sırasında hata oluştu");
     } finally {
       setSubmitting(false);
     }
@@ -273,7 +245,7 @@ export default function CreateLeaveAdminScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <LinearGradient colors={["#4a00e0", "#8e2de2"]} style={styles.header}>
         <TouchableOpacity
@@ -287,7 +259,6 @@ export default function CreateLeaveAdminScreen() {
           Kullanıcı için izin talebi oluşturun
         </Text>
       </LinearGradient>
-
       <Animated.ScrollView style={[styles.content, { opacity: fadeAnim }]}>
         {/* Kullanıcı Seçimi */}
         <View style={styles.section}>
@@ -324,7 +295,6 @@ export default function CreateLeaveAdminScreen() {
             <Ionicons name="chevron-down" size={20} color="#666" />
           </TouchableOpacity>
         </View>
-
         {/* Tarih Seçimi */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>İzin Tarihleri</Text>
@@ -346,7 +316,6 @@ export default function CreateLeaveAdminScreen() {
                 </Text>
               </LinearGradient>
             </TouchableOpacity>
-
             <TouchableOpacity
               style={styles.dateButton}
               onPress={() => {
@@ -364,26 +333,49 @@ export default function CreateLeaveAdminScreen() {
             </TouchableOpacity>
           </View>
         </View>
-
         {/* Saat Seçimi */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Saat Bilgileri</Text>
           <View style={styles.timeContainer}>
             <View style={styles.timeInput}>
               <Text style={styles.timeLabel}>Başlangıç Saati</Text>
-              <Text style={styles.timeValue}>{formatTime(startTime)}</Text>
+              <View style={{ marginBottom: 8 }}>
+                <MaskedTextInput
+                  mask="99:99"
+                  onChangeText={(text, rawText) => setStartTimeRaw(rawText)}
+                  value={startTimeRaw}
+                  keyboardType="numeric"
+                  placeholder="--:--"
+                  placeholderTextColor="#888"
+                  style={[
+                    styles.timeTextInput,
+                    { fontSize: 18, height: 48, paddingHorizontal: 16 },
+                  ]}
+                />
+              </View>
             </View>
             <View style={styles.timeInput}>
               <Text style={styles.timeLabel}>Bitiş Saati</Text>
-              <Text style={styles.timeValue}>{formatTime(endTime)}</Text>
+              <View style={{ marginBottom: 8 }}>
+                <MaskedTextInput
+                  mask="99:99"
+                  onChangeText={(text, rawText) => setEndTimeRaw(rawText)}
+                  value={endTimeRaw}
+                  keyboardType="numeric"
+                  placeholder="--:--"
+                  placeholderTextColor="#888"
+                  style={[
+                    styles.timeTextInput,
+                    { fontSize: 18, height: 48, paddingHorizontal: 16 },
+                  ]}
+                />
+              </View>
             </View>
           </View>
         </View>
-
         {/* Ders Bilgileri */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Ders Bilgileri</Text>
-
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>Ders Kodu</Text>
             <TextInput
@@ -394,7 +386,6 @@ export default function CreateLeaveAdminScreen() {
               placeholderTextColor="#999"
             />
           </View>
-
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>Yerine Gelen Hoca</Text>
             <TouchableOpacity
@@ -419,7 +410,6 @@ export default function CreateLeaveAdminScreen() {
             </TouchableOpacity>
           </View>
         </View>
-
         {/* İzin Nedeni */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>İzin Nedeni</Text>
@@ -434,7 +424,6 @@ export default function CreateLeaveAdminScreen() {
             textAlignVertical="top"
           />
         </View>
-
         {/* Gönder Butonu */}
         <TouchableOpacity
           style={[
@@ -458,7 +447,6 @@ export default function CreateLeaveAdminScreen() {
           )}
         </TouchableOpacity>
       </Animated.ScrollView>
-
       {/* Kullanıcı Seçim Modal */}
       <Modal
         visible={showUserModal}
@@ -473,14 +461,13 @@ export default function CreateLeaveAdminScreen() {
             <Text style={styles.modalTitle}>Kullanıcı Seçin</Text>
             <View style={{ width: 24 }} />
           </View>
-
           <TextInput
-            style={styles.searchInput}
-            placeholder="Kullanıcı adı ile arama yapın..."
+            style={[styles.searchInput, { color: "#222" }]}
+            placeholder="Öğretmen adı ile arama yapın.."
+            placeholderTextColor="#888"
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
-
           <ScrollView style={styles.userList}>
             {filteredUsers.map((user) => (
               <TouchableOpacity
@@ -503,7 +490,6 @@ export default function CreateLeaveAdminScreen() {
           </ScrollView>
         </View>
       </Modal>
-
       {/* Hoca Seçim Modal */}
       <Modal
         visible={showLecturerModal}
@@ -518,19 +504,18 @@ export default function CreateLeaveAdminScreen() {
             <Text style={styles.modalTitle}>Hoca Seçin</Text>
             <View style={{ width: 24 }} />
           </View>
-
           <TextInput
-            style={styles.searchInput}
-            placeholder="Hoca adı ile arama yapın..."
+            style={[styles.searchInput, { color: "#222" }]}
+            placeholder="Öğretmen adı ile arama yapın.."
+            placeholderTextColor="#888"
             value={lecturerSearchQuery}
             onChangeText={setLecturerSearchQuery}
           />
-
           <ScrollView style={styles.userList}>
             {users
               .filter(
                 (user) =>
-                  user.id !== currentAdminId && // Exclude current admin
+                  user.id !== currentAdminId &&
                   (lecturerSearchQuery.trim() === "" ||
                     user.full_name
                       .toLowerCase()
@@ -557,7 +542,6 @@ export default function CreateLeaveAdminScreen() {
           </ScrollView>
         </View>
       </Modal>
-
       {/* Takvim Modalı */}
       <Modal visible={showCalendar} transparent={true} animationType="slide">
         <View style={styles.calendarModalContainer}>
@@ -575,7 +559,6 @@ export default function CreateLeaveAdminScreen() {
                 <Ionicons name="close" size={24} color="#666" />
               </TouchableOpacity>
             </View>
-
             <Calendar
               minDate={minDate}
               markedDates={markedDates}
@@ -587,7 +570,6 @@ export default function CreateLeaveAdminScreen() {
                 arrowColor: "#4a00e0",
               }}
             />
-
             <View style={styles.calendarFooter}>
               <Text style={styles.selectedDatesText}>
                 {startDate && endDate
@@ -758,10 +740,16 @@ const styles = StyleSheet.create({
     color: "#666",
     marginBottom: 5,
   },
-  timeValue: {
+  timeTextInput: {
     fontSize: 16,
-    fontWeight: "600",
     color: "#333",
+    fontWeight: "600",
+    backgroundColor: "#f8f9fa",
+    borderRadius: 8,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#e9ecef",
+    marginTop: 4,
   },
   inputContainer: {
     marginBottom: 15,
