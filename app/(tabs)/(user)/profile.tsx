@@ -8,11 +8,15 @@ import {
   Alert,
   ActivityIndicator,
   Animated,
+  Modal,
+  TextInput,
+  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { supabase } from "../../../lib/supabase";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
+import { useNotifications } from "../../../hooks/useNotifications";
 
 export default function UserProfileScreen() {
   const [profile, setProfile] = useState<{
@@ -22,12 +26,15 @@ export default function UserProfileScreen() {
     department?: string;
   } | null>(null);
   const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState<string | null>(null);
   const router = useRouter();
 
   const headerAnim = useState(new Animated.Value(0))[0];
   const profileInfoAnim = useState(new Animated.Value(0))[0];
   const settingsAnim = useState(new Animated.Value(0))[0];
   const signOutAnim = useState(new Animated.Value(0))[0];
+
+  const { count: notificationCount } = useNotifications(userId || "");
 
   useEffect(() => {
     const initializePage = async () => {
@@ -70,6 +77,8 @@ export default function UserProfileScreen() {
         router.replace("/auth/login");
         return;
       }
+
+      setUserId(user.id);
 
       const { data: userProfile } = await supabase
         .from("profiles")
@@ -128,7 +137,10 @@ export default function UserProfileScreen() {
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ paddingBottom: 70 }}
+    >
       <Animated.View
         style={[
           styles.header,
@@ -153,8 +165,14 @@ export default function UserProfileScreen() {
           <View style={styles.avatarPlaceholder}>
             <Ionicons name="person-circle-outline" size={80} color="#fff" />
           </View>
-          <View>
-            <Text style={styles.welcomeText}>
+          <View style={{ flex: 1, flexShrink: 1 }}>
+            <Text
+              style={[
+                styles.welcomeText,
+                { flexWrap: "wrap", textAlign: "left", width: "100%" },
+              ]}
+              ellipsizeMode="tail"
+            >
               Hoş Geldin, {profile?.full_name || "Kullanıcı"}!
             </Text>
             <Text style={styles.headerSubtitle}>Profil Bilgilerin</Text>
@@ -185,7 +203,9 @@ export default function UserProfileScreen() {
         </View>
         <View style={styles.infoRow}>
           <Ionicons name="briefcase-outline" size={22} color="#666" />
-          <Text style={styles.infoText}>{profile?.department || "N/A"}</Text>
+          <Text style={styles.infoText}>
+            Departman: {profile?.department || "N/A"}
+          </Text>
         </View>
         <View style={styles.infoRow}>
           <Ionicons name="person-outline" size={22} color="#666" />
@@ -213,7 +233,10 @@ export default function UserProfileScreen() {
       >
         <Text style={styles.sectionTitle}>Hesap Ayarları</Text>
         <View style={styles.settingsContainer}>
-          <TouchableOpacity style={styles.settingItem}>
+          <TouchableOpacity
+            style={styles.settingItem}
+            onPress={() => router.push("/pages/user/change-password")}
+          >
             <Ionicons name="key-outline" size={24} color="#2193b0" />
             <Text style={styles.settingText}>Şifreyi Değiştir</Text>
             <Ionicons
@@ -223,9 +246,22 @@ export default function UserProfileScreen() {
               style={styles.settingArrow}
             />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.settingItem}>
+
+          <TouchableOpacity
+            style={styles.settingItem}
+            onPress={() => router.push("/pages/user/notifications" as any)}
+          >
             <Ionicons name="notifications-outline" size={24} color="#2193b0" />
-            <Text style={styles.settingText}>Bildirim Ayarları</Text>
+            <Text style={styles.settingText}>Bildirimlerim</Text>
+            {notificationCount.unread > 0 && (
+              <View style={styles.notificationBadge}>
+                <Text style={styles.notificationBadgeText}>
+                  {notificationCount.unread > 99
+                    ? "99+"
+                    : notificationCount.unread}
+                </Text>
+              </View>
+            )}
             <Ionicons
               name="chevron-forward"
               size={20}
@@ -233,6 +269,7 @@ export default function UserProfileScreen() {
               style={styles.settingArrow}
             />
           </TouchableOpacity>
+
           <TouchableOpacity style={styles.settingItem}>
             <Ionicons name="timer-outline" size={24} color="#2193b0" />
             <Text style={styles.settingText}>Zaman Takibi Ayarları</Text>
@@ -323,7 +360,7 @@ const styles = StyleSheet.create({
   },
   welcomeText: {
     color: "#fff",
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: "bold",
     marginBottom: 5,
   },
@@ -372,6 +409,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderBottomWidth: 1,
     borderBottomColor: "#f0f0f0",
+    position: "relative",
   },
   settingText: {
     fontSize: 17,
@@ -381,6 +419,21 @@ const styles = StyleSheet.create({
   },
   settingArrow: {
     marginLeft: "auto",
+  },
+  notificationBadge: {
+    backgroundColor: "#ff4757",
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 10,
+    paddingHorizontal: 6,
+  },
+  notificationBadgeText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "bold",
   },
   signOutButtonContainer: {
     marginHorizontal: 20,

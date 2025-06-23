@@ -55,6 +55,16 @@ export default function LeaveRequestCard({
               : "Reddedildi"}
         </Text>
       </View>
+
+      {/* Admin badge if created by admin */}
+      {request.is_created_by_admin && (
+        <View
+          style={[styles.statusBadge, { backgroundColor: "#6c5ce7", top: 40 }]}
+        >
+          <Text style={[styles.statusText, { color: "#fff" }]}>Admin</Text>
+        </View>
+      )}
+
       <TouchableOpacity
         style={styles.summaryRow}
         onPress={toggleExpand}
@@ -82,7 +92,7 @@ export default function LeaveRequestCard({
           {
             maxHeight: animation.interpolate({
               inputRange: [0, 1],
-              outputRange: [0, 160],
+              outputRange: [0, request.is_created_by_admin ? 220 : 160],
             }),
             opacity: animation,
             paddingVertical: expanded ? 14 : 0,
@@ -108,6 +118,52 @@ export default function LeaveRequestCard({
                 })}
               </Text>
             </View>
+
+            {/* Show time information if available (admin-created) */}
+            {request.start_time && request.end_time && (
+              <View style={styles.detailRow}>
+                <Ionicons
+                  name="time-outline"
+                  size={20}
+                  color="#4a00e0"
+                  style={styles.detailIcon}
+                />
+                <Text style={styles.detailText}>
+                  {request.start_time} - {request.end_time}
+                </Text>
+              </View>
+            )}
+
+            {/* Show course code if available (admin-created) */}
+            {request.course_code && (
+              <View style={styles.detailRow}>
+                <Ionicons
+                  name="school-outline"
+                  size={20}
+                  color="#4a00e0"
+                  style={styles.detailIcon}
+                />
+                <Text style={styles.detailText}>
+                  Ders: {request.course_code}
+                </Text>
+              </View>
+            )}
+
+            {/* Show replaced lecturer if available (admin-created) */}
+            {request.replaced_lecturer_profile && (
+              <View style={styles.detailRow}>
+                <Ionicons
+                  name="people-outline"
+                  size={20}
+                  color="#4a00e0"
+                  style={styles.detailIcon}
+                />
+                <Text style={styles.detailText}>
+                  Yerine: {request.replaced_lecturer_profile.full_name}
+                </Text>
+              </View>
+            )}
+
             <View style={styles.detailRow}>
               <Ionicons
                 name="document-text-outline"

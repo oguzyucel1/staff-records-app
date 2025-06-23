@@ -8,6 +8,11 @@ import {
   Alert,
   ActivityIndicator,
   Animated,
+  Modal,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
+  RefreshControl,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { supabase } from "../../../lib/supabase";
@@ -36,6 +41,7 @@ export default function AdminHomeScreen() {
   const [adminProfile, setAdminProfile] = useState<{
     full_name: string;
   } | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     const initializePage = async () => {
@@ -188,6 +194,40 @@ export default function AdminHomeScreen() {
     }
   };
 
+  const passwordCriteria = (password: string) => {
+    return (
+      password.length >= 8 &&
+      /[A-Z]/.test(password) &&
+      /[0-9]/.test(password) &&
+      /[!@#$%^&*(),.?":{}|<>]/.test(password)
+    );
+  };
+
+  const generatePassword = () => {
+    const upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const lower = "abcdefghijklmnopqrstuvwxyz";
+    const numbers = "0123456789";
+    const special = "!@#$%^&*()_+[]{}|;:,.<>?";
+    let all = upper + lower + numbers + special;
+    let password = "";
+    password += upper[Math.floor(Math.random() * upper.length)];
+    password += numbers[Math.floor(Math.random() * numbers.length)];
+    password += special[Math.floor(Math.random() * special.length)];
+    for (let i = 3; i < 10; i++) {
+      password += all[Math.floor(Math.random() * all.length)];
+    }
+    return password
+      .split("")
+      .sort(() => 0.5 - Math.random())
+      .join("");
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchUsersAndStats();
+    setRefreshing(false);
+  };
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -222,6 +262,14 @@ export default function AdminHomeScreen() {
       <ScrollView
         style={styles.content}
         contentContainerStyle={{ paddingBottom: 70 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={["#4a00e0"]}
+            tintColor="#4a00e0"
+          />
+        }
       >
         <View style={styles.statsSection}>
           <Text style={styles.sectionTitle}>Genel İstatistikler</Text>
@@ -250,22 +298,16 @@ export default function AdminHomeScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Hızlı Eylemler</Text>
           <View style={styles.actionsContainer}>
-            <TouchableOpacity style={styles.actionButton}>
-              <LinearGradient
-                colors={["#6dd5ed", "#2193b0"]}
-                style={styles.actionButtonGradient}
-              >
-                <Ionicons name="person-add-outline" size={28} color="#fff" />
-                <Text style={styles.actionButtonText}>Kullanıcı Ekle</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.actionButton}>
+            <TouchableOpacity
+              style={styles.actionButton}
+              onPress={() => router.push("/pages/admin/create-leave-admin")}
+            >
               <LinearGradient
                 colors={["#FFD700", "#FFA000"]}
                 style={styles.actionButtonGradient}
               >
                 <Ionicons name="document-text-outline" size={28} color="#fff" />
-                <Text style={styles.actionButtonText}>Rapor Görüntüle</Text>
+                <Text style={styles.actionButtonText}>İzin Oluştur</Text>
               </LinearGradient>
             </TouchableOpacity>
             <TouchableOpacity style={styles.actionButton}>
@@ -281,7 +323,40 @@ export default function AdminHomeScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Kullanıcı Yönetimi</Text>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              marginBottom: 15,
+              justifyContent: "space-between",
+            }}
+          >
+            <Text style={styles.sectionTitle}>Kullanıcı Yönetimi</Text>
+            <TouchableOpacity
+              onPress={fetchUsersAndStats}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                backgroundColor: "#f0f2f5",
+                borderRadius: 20,
+                paddingVertical: 6,
+                paddingHorizontal: 14,
+              }}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Ionicons
+                name="refresh"
+                size={18}
+                color="#4a00e0"
+                style={{ marginRight: 6 }}
+              />
+              <Text
+                style={{ color: "#4a00e0", fontWeight: "bold", fontSize: 14 }}
+              >
+                Yenile
+              </Text>
+            </TouchableOpacity>
+          </View>
           {users.length > 0 ? (
             users.map((user) => (
               <View key={user.id} style={styles.userCard}>

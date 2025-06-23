@@ -166,7 +166,10 @@ export default function AdminPanel() {
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ paddingBottom: 70 }}
+    >
       {/* Header */}
       <Animated.View
         style={[
@@ -264,6 +267,48 @@ export default function AdminPanel() {
                 <Text style={styles.pendingRequestsTitle}>QR Kod Oluştur</Text>
                 <Text style={styles.pendingRequestsSubtitle}>
                   Yeni bir QR kod oluştur ve paylaş
+                </Text>
+              </View>
+            </View>
+            <View style={styles.pendingRequestsRight}>
+              <Ionicons name="chevron-forward" size={24} color="#4a00e0" />
+            </View>
+          </View>
+        </TouchableOpacity>
+      </Animated.View>
+
+      {/* Attendance Logs Banner */}
+      <Animated.View
+        style={[
+          styles.pendingRequestsBannerContainer,
+          {
+            opacity: bannerAnim,
+            transform: [
+              {
+                translateY: bannerAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [-30, 0],
+                }),
+              },
+            ],
+          },
+        ]}
+      >
+        <TouchableOpacity
+          style={styles.pendingRequestsBanner}
+          onPress={() => router.push("/pages/admin/attendance-logs" as any)}
+        >
+          <View style={styles.pendingRequestsContent}>
+            <View style={styles.pendingRequestsLeft}>
+              <View style={styles.pendingRequestsIconContainer}>
+                <Ionicons name="list-outline" size={24} color="#4a00e0" />
+              </View>
+              <View>
+                <Text style={styles.pendingRequestsTitle}>
+                  Bütün Kayıtları Görüntüle
+                </Text>
+                <Text style={styles.pendingRequestsSubtitle}>
+                  Tüm kullanıcıların giriş/çıkış kayıtlarını incele
                 </Text>
               </View>
             </View>
@@ -428,6 +473,7 @@ const styles = StyleSheet.create({
     elevation: 5,
     alignItems: "center",
     justifyContent: "center",
+    paddingTop: 20,
   },
   headerTitle: {
     color: "#fff",

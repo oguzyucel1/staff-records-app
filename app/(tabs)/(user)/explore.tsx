@@ -73,7 +73,8 @@ export default function UserExploreScreen() {
         .select(
           `
           *,
-          profiles:user_id (full_name, email, department)
+          profiles:user_id (full_name, email, department),
+          replaced_lecturer_profile:replaced_lecturer (full_name, email, department)
         `
         )
         .eq("user_id", user.id)
@@ -160,9 +161,22 @@ export default function UserExploreScreen() {
               <ActivityIndicator size="large" color="#6dd5ed" />
             </View>
           ) : leaveRequests.length > 0 ? (
-            leaveRequests.map((request) => (
-              <LeaveRequestCard key={request.id} request={request} />
-            ))
+            <>
+              {leaveRequests.slice(0, 2).map((request) => (
+                <LeaveRequestCard key={request.id} request={request} />
+              ))}
+              {leaveRequests.length > 2 && (
+                <TouchableOpacity
+                  style={styles.viewAllButton}
+                  onPress={() => router.push("/pages/user/all-leaves")}
+                >
+                  <Text style={styles.viewAllButtonText}>
+                    Tüm İzin Taleplerimi Görüntüle
+                  </Text>
+                  <Ionicons name="arrow-forward" size={20} color="#4a00e0" />
+                </TouchableOpacity>
+              )}
+            </>
           ) : (
             <View style={styles.emptyContainer}>
               <Ionicons name="calendar-outline" size={60} color="#bbb" />
@@ -432,6 +446,24 @@ const styles = StyleSheet.create({
   logsButtonText: {
     color: "#fff",
     fontSize: 20,
+    fontWeight: "bold",
+    letterSpacing: 0.2,
+  },
+  viewAllButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#f0f2f5",
+    borderRadius: 16,
+    paddingVertical: 16,
+    marginTop: 12,
+    borderWidth: 2,
+    borderColor: "#4a00e0",
+    gap: 8,
+  },
+  viewAllButtonText: {
+    color: "#4a00e0",
+    fontSize: 16,
     fontWeight: "bold",
     letterSpacing: 0.2,
   },

@@ -55,6 +55,9 @@ export default {
       router: {},
       supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL,
       supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
+      emailjsServiceId: process.env.EXPO_PUBLIC_EMAILJS_SERVICE_ID,
+      emailjsTemplateId: process.env.EXPO_PUBLIC_EMAILJS_TEMPLATE_ID,
+      emailjsPublicKey: process.env.EXPO_PUBLIC_EMAILJS_PUBLIC_KEY,
       eas: {
         projectId: "a854bbcb-c183-43e9-b492-6a5d0bb913dc",
       },

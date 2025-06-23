@@ -15,6 +15,7 @@ import { useRouter } from "expo-router";
 import { supabase } from "../../../lib/supabase";
 import LeaveRequestCard from "../../components/LeaveRequestCard";
 import { LeaveRequest } from "../../../types/leave";
+import { NotificationService } from "../../../lib/notificationService";
 
 export default function PendingLeaves() {
   const router = useRouter();
@@ -62,6 +63,7 @@ export default function PendingLeaves() {
 
   const handleApprove = async (requestId: string) => {
     try {
+      // İzin talebini onayla
       const { error } = await supabase
         .from("leave_requests")
         .update({ status: "approved" })
@@ -69,9 +71,26 @@ export default function PendingLeaves() {
 
       if (error) throw error;
 
+      // İzin talebini bul
+      const leaveRequest = leaveRequests.find((req) => req.id === requestId);
+      if (leaveRequest) {
+        // Kullanıcıya bildirim gönder
+        await NotificationService.createLeaveNotification(
+          leaveRequest.user_id,
+          requestId,
+          leaveRequest.leave_type,
+          leaveRequest.start_date,
+          leaveRequest.end_date,
+          true // approved
+        );
+      }
+
       // Listeyi güncelle
       setLeaveRequests((prev) => prev.filter((req) => req.id !== requestId));
-      Alert.alert("Başarılı", "İzin talebi onaylandı.");
+      Alert.alert(
+        "Başarılı",
+        "İzin talebi onaylandı ve kullanıcıya bildirim gönderildi."
+      );
     } catch (error) {
       console.error("Error approving leave request:", error);
       Alert.alert("Hata", "İzin talebi onaylanırken bir hata oluştu.");
@@ -80,6 +99,7 @@ export default function PendingLeaves() {
 
   const handleReject = async (requestId: string) => {
     try {
+      // İzin talebini reddet
       const { error } = await supabase
         .from("leave_requests")
         .update({ status: "rejected" })
@@ -87,9 +107,26 @@ export default function PendingLeaves() {
 
       if (error) throw error;
 
+      // İzin talebini bul
+      const leaveRequest = leaveRequests.find((req) => req.id === requestId);
+      if (leaveRequest) {
+        // Kullanıcıya bildirim gönder
+        await NotificationService.createLeaveNotification(
+          leaveRequest.user_id,
+          requestId,
+          leaveRequest.leave_type,
+          leaveRequest.start_date,
+          leaveRequest.end_date,
+          false // rejected
+        );
+      }
+
       // Listeyi güncelle
       setLeaveRequests((prev) => prev.filter((req) => req.id !== requestId));
-      Alert.alert("Başarılı", "İzin talebi reddedildi.");
+      Alert.alert(
+        "Başarılı",
+        "İzin talebi reddedildi ve kullanıcıya bildirim gönderildi."
+      );
     } catch (error) {
       console.error("Error rejecting leave request:", error);
       Alert.alert("Hata", "İzin talebi reddedilirken bir hata oluştu.");

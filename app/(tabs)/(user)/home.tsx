@@ -140,7 +140,7 @@ export default function UserHomeScreen() {
           <View style={styles.avatarPlaceholder}>
             <Ionicons name="person-circle-outline" size={60} color="#fff" />
           </View>
-          <View>
+          <View style={{ flex: 1, flexShrink: 1 }}>
             <Text style={styles.welcomeText}>
               Merhaba, {profile?.full_name || "Kullanıcı"}!
             </Text>
