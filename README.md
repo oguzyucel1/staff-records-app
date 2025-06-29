@@ -15,6 +15,8 @@
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 ![EAS Build](https://img.shields.io/badge/EAS_Build-4630EB?style=for-the-badge&logo=expo&logoColor=white)
+![TypeScript](https://img.shields.io/badge/typescript-20232A?style=for-the-badge&logo=typescript&logoColor=61DAFB)
+
 
 ---
 
@@ -35,6 +37,9 @@
 - 🌗 **Modern ve Şık Arayüz**
   - React Native + Expo ile geliştirildi.
   - iOS ve Android desteği.
+ 
+- 🔔 **Canlı Bildirim**
+  - Bütün işletim sistemleri için onaylarda ve taleplerde canlı bildirim özelliği.
 
 ---
 
