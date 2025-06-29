@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Stack } from "expo-router";
-import { Animated, View, Image } from "react-native";
+import { Animated, View, Image, Text } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import "./globals.css"; // Ensure global styles are imported
 
@@ -19,7 +19,9 @@ export default function RootLayout() {
       });
     }, 2000);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+    };
   }, []);
 
   if (!isReady) {

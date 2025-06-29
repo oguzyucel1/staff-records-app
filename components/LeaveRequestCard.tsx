@@ -316,7 +316,10 @@ const styles = StyleSheet.create({
   chevronWrapper: {
     marginTop: 16,
     marginLeft: 0,
-    alignSelf: "flex-end",
+    paddingTop: 15,
+    paddingRight: 15,
+
+    borderRadius: 10,
   },
   details: {
     paddingHorizontal: 22,

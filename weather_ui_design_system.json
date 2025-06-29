@@ -1,0 +1,322 @@
+{
+  "designSystem": {
+    "name": "Modern Weather App UI",
+    "version": "1.0.0",
+    "description": "Dark-themed mobile weather application with glassmorphism and modern UI patterns",
+    
+    "colorPalette": {
+      "primary": {
+        "background": "#1a1a2e",
+        "surface": "#16213e",
+        "surfaceVariant": "#0f1419",
+        "accent": "#ff6b35",
+        "accentSecondary": "#4a90e2"
+      },
+      "semantic": {
+        "warning": "#ffb347",
+        "success": "#4caf50",
+        "info": "#2196f3",
+        "text": {
+          "primary": "#ffffff",
+          "secondary": "#b8bcc8",
+          "muted": "#6b7280"
+        }
+      },
+      "gradients": {
+        "cardBackground": "linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)",
+        "primaryGradient": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        "weatherGradient": "linear-gradient(180deg, #2c5aa0 0%, #1e3c72 100%)"
+      }
+    },
+
+    "typography": {
+      "fontFamily": "SF Pro Display, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif",
+      "scales": {
+        "hero": {
+          "fontSize": "48px",
+          "fontWeight": "700",
+          "lineHeight": "1.1",
+          "letterSpacing": "-0.02em"
+        },
+        "title": {
+          "fontSize": "24px",
+          "fontWeight": "600",
+          "lineHeight": "1.2",
+          "letterSpacing": "-0.01em"
+        },
+        "subtitle": {
+          "fontSize": "18px",
+          "fontWeight": "500",
+          "lineHeight": "1.3"
+        },
+        "body": {
+          "fontSize": "16px",
+          "fontWeight": "400",
+          "lineHeight": "1.4"
+        },
+        "caption": {
+          "fontSize": "14px",
+          "fontWeight": "400",
+          "lineHeight": "1.3"
+        },
+        "small": {
+          "fontSize": "12px",
+          "fontWeight": "400",
+          "lineHeight": "1.2"
+        }
+      }
+    },
+
+    "spacing": {
+      "xs": "4px",
+      "sm": "8px",
+      "md": "16px",
+      "lg": "24px",
+      "xl": "32px",
+      "xxl": "48px",
+      "container": "20px"
+    },
+
+    "borderRadius": {
+      "sm": "8px",
+      "md": "16px",
+      "lg": "24px",
+      "xl": "32px",
+      "full": "9999px"
+    },
+
+    "shadows": {
+      "card": "0 8px 32px rgba(0, 0, 0, 0.3)",
+      "subtle": "0 2px 8px rgba(0, 0, 0, 0.15)",
+      "elevated": "0 16px 64px rgba(0, 0, 0, 0.4)"
+    },
+
+    "components": {
+      "card": {
+        "base": {
+          "background": "rgba(255, 255, 255, 0.1)",
+          "backdropFilter": "blur(20px)",
+          "border": "1px solid rgba(255, 255, 255, 0.2)",
+          "borderRadius": "16px",
+          "padding": "20px",
+          "boxShadow": "0 8px 32px rgba(0, 0, 0, 0.3)"
+        },
+        "variants": {
+          "primary": {
+            "background": "linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)"
+          },
+          "secondary": {
+            "background": "rgba(22, 33, 62, 0.8)"
+          },
+          "compact": {
+            "padding": "12px",
+            "borderRadius": "12px"
+          }
+        }
+      },
+
+      "button": {
+        "base": {
+          "borderRadius": "12px",
+          "padding": "12px 20px",
+          "fontWeight": "500",
+          "transition": "all 0.2s ease"
+        },
+        "variants": {
+          "primary": {
+            "background": "#ff6b35",
+            "color": "#ffffff"
+          },
+          "secondary": {
+            "background": "rgba(255, 255, 255, 0.1)",
+            "color": "#ffffff",
+            "border": "1px solid rgba(255, 255, 255, 0.2)"
+          },
+          "ghost": {
+            "background": "transparent",
+            "color": "#b8bcc8"
+          }
+        }
+      },
+
+      "iconButton": {
+        "base": {
+          "width": "44px",
+          "height": "44px",
+          "borderRadius": "12px",
+          "background": "rgba(255, 255, 255, 0.1)",
+          "backdropFilter": "blur(10px)",
+          "border": "1px solid rgba(255, 255, 255, 0.2)",
+          "display": "flex",
+          "alignItems": "center",
+          "justifyContent": "center"
+        }
+      },
+
+      "weatherIcon": {
+        "size": {
+          "small": "24px",
+          "medium": "32px",
+          "large": "48px",
+          "hero": "80px"
+        },
+        "style": {
+          "filter": "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))"
+        }
+      },
+
+      "navigationBar": {
+        "height": "88px",
+        "background": "transparent",
+        "paddingTop": "44px",
+        "paddingHorizontal": "20px",
+        "display": "flex",
+        "alignItems": "center",
+        "justifyContent": "space-between"
+      },
+
+      "tabBar": {
+        "height": "80px",
+        "background": "rgba(22, 33, 62, 0.9)",
+        "backdropFilter": "blur(20px)",
+        "borderTop": "1px solid rgba(255, 255, 255, 0.1)",
+        "paddingBottom": "20px"
+      }
+    },
+
+    "layouts": {
+      "screen": {
+        "padding": "20px",
+        "background": "linear-gradient(180deg, #2c5aa0 0%, #1e3c72 100%)",
+        "minHeight": "100vh"
+      },
+      
+      "grid": {
+        "weatherCards": {
+          "display": "grid",
+          "gridTemplateColumns": "1fr 1fr",
+          "gap": "12px"
+        },
+        "forecastList": {
+          "display": "flex",
+          "flexDirection": "column",
+          "gap": "8px"
+        }
+      },
+
+      "sections": {
+        "header": {
+          "marginBottom": "24px"
+        },
+        "mainWeather": {
+          "textAlign": "center",
+          "marginBottom": "32px"
+        },
+        "weatherDetails": {
+          "marginBottom": "24px"
+        },
+        "forecast": {
+          "marginBottom": "24px"
+        }
+      }
+    },
+
+    "animations": {
+      "transitions": {
+        "default": "all 0.2s ease",
+        "slow": "all 0.3s ease",
+        "spring": "all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)"
+      },
+      "hover": {
+        "scale": "transform: scale(1.02)",
+        "opacity": "opacity: 0.8"
+      }
+    },
+
+    "designPrinciples": {
+      "glassmorphism": {
+        "description": "Use semi-transparent backgrounds with blur effects",
+        "implementation": {
+          "background": "rgba(255, 255, 255, 0.1)",
+          "backdropFilter": "blur(20px)",
+          "border": "1px solid rgba(255, 255, 255, 0.2)"
+        }
+      },
+      
+      "darkTheme": {
+        "description": "Dark color scheme with high contrast for readability",
+        "characteristics": [
+          "Dark backgrounds with subtle gradients",
+          "Light text on dark surfaces",
+          "Colored accents for interactive elements",
+          "Semi-transparent overlays"
+        ]
+      },
+
+      "modernMobile": {
+        "description": "Mobile-first design with touch-friendly interactions",
+        "characteristics": [
+          "Minimum 44px touch targets",
+          "Card-based layout",
+          "Bottom navigation",
+          "Safe area padding"
+        ]
+      },
+
+      "weatherVisualization": {
+        "description": "Weather-specific UI patterns and iconography",
+        "elements": [
+          "Weather condition icons",
+          "Temperature displays with large typography",
+          "Forecast cards with consistent layout",
+          "Location-based headers",
+          "Time-based data presentation"
+        ]
+      }
+    },
+
+    "patterns": {
+      "cardLayout": {
+        "description": "Primary content organization pattern",
+        "structure": {
+          "container": "Glassmorphic card container",
+          "header": "Title and optional icon",
+          "content": "Main data or information",
+          "footer": "Additional details or actions"
+        }
+      },
+
+      "weatherCard": {
+        "description": "Specific pattern for weather information display",
+        "elements": [
+          "Weather icon (top-left or centered)",
+          "Primary temperature (large, prominent)",
+          "Secondary information (smaller text)",
+          "Background treatment based on conditions"
+        ]
+      },
+
+      "listItem": {
+        "description": "Pattern for forecast and detail items",
+        "structure": {
+          "leading": "Icon or time indicator",
+          "content": "Primary and secondary text",
+          "trailing": "Value or additional info"
+        }
+      }
+    },
+
+    "responsiveness": {
+      "breakpoints": {
+        "mobile": "320px - 768px",
+        "tablet": "768px - 1024px",
+        "desktop": "1024px+"
+      },
+      "adaptations": {
+        "mobile": "Single column layout, bottom navigation",
+        "tablet": "Multi-column grid, side navigation option",
+        "desktop": "Sidebar layout, hover states"
+      }
+    }
+  }
+}

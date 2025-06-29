@@ -1,17 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Alert,
-  ImageBackground,
   Dimensions,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
-import { useEffect, useState } from "react";
+import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
-import { BlurView } from "expo-blur";
 import { router } from "expo-router";
 import { supabase } from "../../lib/supabase";
 import { PushNotificationService } from "../../lib/pushNotificationService";
@@ -24,10 +23,12 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleLogin = async () => {
+    setError(null);
     if (!email || !password) {
-      Alert.alert("Error", "Please fill in all fields");
+      setError("Please fill in all fields");
       return;
     }
     try {
@@ -37,11 +38,11 @@ export default function LoginScreen() {
         password,
       });
       if (error) {
-        Alert.alert("Login Failed", "Invalid email or password.");
+        setError("Incorrect password.");
         return;
       }
       if (!data.user) {
-        Alert.alert("Error", "Login failed. Please try again.");
+        setError("Login failed. Please try again.");
         return;
       }
       const { data: profile, error: profileError } = await supabase
@@ -62,10 +63,7 @@ export default function LoginScreen() {
             },
           ]);
         if (createProfileError) {
-          Alert.alert(
-            "Error",
-            "Failed to set up your account. Please try again."
-          );
+          setError("Failed to set up your account. Please try again.");
           await supabase.auth.signOut();
           return;
         }
@@ -87,229 +85,248 @@ export default function LoginScreen() {
         router.replace("/(tabs)/(user)/home");
       }
     } catch (error: any) {
-      Alert.alert("Error", "An unexpected error occurred. Please try again.");
+      setError("An unexpected error occurred. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <ImageBackground
-        source={require("../../assets/images/login-bg.png")}
-        style={styles.background}
-        resizeMode="cover"
-      >
-        {/* Dark overlay for less brightness */}
-        <View style={styles.overlay} />
-        <View style={styles.cardWrapper}>
-          <BlurView intensity={60} tint="dark" style={styles.card}>
-            <View style={styles.logoBox}>
-              <View style={styles.logoCircle}>
-                <Ionicons name="school" size={44} color="#fff" />
-              </View>
+    <LinearGradient
+      colors={["#1a1a2e", "#16213e", "#0f3460"]}
+      style={styles.background}
+    >
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <View style={styles.logoContainer}>
+            <Ionicons name="people-circle" size={60} color="#FFFFFF" />
+          </View>
+          <Text style={styles.appName}>Staff Records</Text>
+          <Text style={styles.appTagline}>Employee Management System</Text>
+        </View>
+
+        <View style={styles.formContainer}>
+          <View style={styles.inputContainer}>
+            <View
+              style={[
+                styles.inputWrapper,
+                focusedInput === "email" && styles.inputWrapperFocused,
+              ]}
+            >
+              <Ionicons
+                name="mail-outline"
+                size={20}
+                color={
+                  focusedInput === "email" ? "#FFFFFF" : "rgba(255,255,255,0.7)"
+                }
+                style={styles.inputIcon}
+              />
+              <TextInput
+                style={[
+                  styles.input,
+                  focusedInput === "email" && styles.inputFocused,
+                ]}
+                placeholder="Email"
+                placeholderTextColor="rgba(255,255,255,0.7)"
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+                autoCorrect={false}
+                keyboardType="email-address"
+                returnKeyType="next"
+                onFocus={() => setFocusedInput("email")}
+                onBlur={() => setFocusedInput(null)}
+              />
             </View>
-            <Text style={styles.title}>Hoş Geldiniz</Text>
-            <Text style={styles.subtitle}>Lütfen giriş yapın</Text>
-            <View style={styles.formArea}>
-              <View style={styles.inputGroup}>
-                <Ionicons
-                  name="mail-outline"
-                  size={20}
-                  color="#4a00e0"
-                  style={styles.inputIcon}
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="E-posta adresi"
-                  placeholderTextColor="#bbb"
-                  value={email}
-                  onChangeText={setEmail}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  returnKeyType="next"
-                  autoCorrect={false}
-                  autoFocus={true}
-                  onFocus={() => setFocusedInput("email")}
-                  onBlur={() => setFocusedInput(null)}
-                />
-              </View>
-              <View style={styles.inputGroup}>
-                <Ionicons
-                  name="lock-closed-outline"
-                  size={20}
-                  color="#4a00e0"
-                  style={styles.inputIcon}
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Şifre"
-                  placeholderTextColor="#bbb"
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry={!showPassword}
-                  returnKeyType="done"
-                  autoCorrect={false}
-                  onFocus={() => setFocusedInput("password")}
-                  onBlur={() => setFocusedInput(null)}
-                />
-                <TouchableOpacity
-                  style={styles.eyeButton}
-                  onPress={() => setShowPassword(!showPassword)}
-                >
-                  <Ionicons
-                    name={showPassword ? "eye-off" : "eye"}
-                    size={20}
-                    color="#999"
-                  />
-                </TouchableOpacity>
-              </View>
+          </View>
+
+          <View style={styles.inputContainer}>
+            <View
+              style={[
+                styles.inputWrapper,
+                focusedInput === "password" && styles.inputWrapperFocused,
+              ]}
+            >
+              <Ionicons
+                name="lock-closed-outline"
+                size={20}
+                color={
+                  focusedInput === "password"
+                    ? "#FFFFFF"
+                    : "rgba(255,255,255,0.7)"
+                }
+                style={styles.inputIcon}
+              />
+              <TextInput
+                style={[
+                  styles.input,
+                  focusedInput === "password" && styles.inputFocused,
+                ]}
+                placeholder="Password"
+                placeholderTextColor="rgba(255,255,255,0.7)"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
+                returnKeyType="done"
+                onFocus={() => setFocusedInput("password")}
+                onBlur={() => setFocusedInput(null)}
+              />
               <TouchableOpacity
-                style={[styles.button, loading && styles.buttonDisabled]}
-                onPress={handleLogin}
-                disabled={loading}
-                activeOpacity={0.85}
+                style={styles.eyeButton}
+                onPress={() => setShowPassword(!showPassword)}
+                activeOpacity={0.7}
               >
-                <Text style={styles.buttonText}>
-                  {loading ? "Giriş Yapılıyor..." : "Giriş Yap"}
-                </Text>
                 <Ionicons
-                  name="log-in"
+                  name={showPassword ? "eye-off" : "eye"}
                   size={20}
-                  color="#fff"
-                  style={{ marginLeft: 6 }}
+                  color="rgba(255,255,255,0.7)"
                 />
               </TouchableOpacity>
             </View>
-          </BlurView>
+          </View>
+
+          {error && (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+          )}
+
+          <TouchableOpacity
+            style={[styles.loginButton, loading && styles.loginButtonDisabled]}
+            onPress={handleLogin}
+            disabled={loading}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.loginButtonText}>
+              {loading ? "Giriş Yapılıyor..." : "Giriş Yap"}
+            </Text>
+          </TouchableOpacity>
         </View>
-      </ImageBackground>
-    </View>
+
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>
+            © 2025 Staff Records. All rights reserved.
+          </Text>
+        </View>
+      </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#181c2f",
-  },
   background: {
     flex: 1,
-    width: "100%",
-    height: "100%",
-    justifyContent: "flex-start",
+  },
+  container: {
+    flex: 1,
+    justifyContent: "space-between",
     alignItems: "center",
+    paddingHorizontal: 24,
+    paddingTop: 60,
+    paddingBottom: 40,
   },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(20, 20, 50, 0.68)",
-    zIndex: 1,
-  },
-  cardWrapper: {
-    width: "100%",
+  header: {
     alignItems: "center",
-    marginTop: height * 0.1,
-    zIndex: 2,
+    marginTop: 40,
   },
-  card: {
-    width: 320,
-    borderRadius: 32,
-    paddingVertical: 64,
-    paddingHorizontal: 36,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.22,
-    shadowRadius: 32,
-    elevation: 16,
-    backgroundColor: "rgba(255,255,255,0.13)",
-    overflow: "hidden",
+  logoContainer: {
+    marginBottom: 16,
   },
-  logoBox: {
-    marginBottom: 12,
-    alignItems: "center",
-  },
-  logoCircle: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: "rgba(74,0,224,0.85)",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 2,
-    shadowColor: "#4a00e0",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.18,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: "#fff",
-    marginBottom: 8,
+  appName: {
+    fontSize: 42,
+    fontWeight: "800",
+    color: "#FFFFFF",
+    marginBottom: 4,
     textAlign: "center",
-    letterSpacing: 0.2,
+    letterSpacing: 1,
   },
-  subtitle: {
-    fontSize: 20,
-    color: "rgba(255,255,255,0.85)",
+  appTagline: {
+    fontSize: 14,
+    color: "rgba(255,255,255,0.8)",
     marginBottom: 32,
     textAlign: "center",
-    letterSpacing: 0.1,
+    fontWeight: "500",
   },
-  formArea: {
+
+  formContainer: {
     width: "100%",
-    alignItems: "center",
+    maxWidth: 400,
+    marginTop: -200,
   },
-  inputGroup: {
+  inputContainer: {
+    marginBottom: 20,
+  },
+  inputWrapper: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.22)",
-    borderRadius: 12,
-    paddingHorizontal: 18,
-    marginBottom: 28,
-    width: 260,
-    borderWidth: 1.5,
-    borderColor: "rgba(74,0,224,0.13)",
-    height: 56,
+    backgroundColor: "rgba(255,255,255,0.15)",
+    borderRadius: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.2)",
+  },
+  inputWrapperFocused: {
+    borderColor: "#FFFFFF",
   },
   inputIcon: {
     marginRight: 12,
   },
   input: {
     flex: 1,
-    fontSize: 20,
-    color: "#222",
-    paddingVertical: 16,
+    fontSize: 16,
+    color: "#FFFFFF",
+    paddingVertical: 18,
     backgroundColor: "transparent",
+  },
+  inputFocused: {
+    borderColor: "#FFFFFF",
   },
   eyeButton: {
     padding: 8,
   },
-  button: {
-    flexDirection: "row",
+  errorContainer: {
+    backgroundColor: "rgba(255, 59, 48, 0.2)",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: "rgba(255, 59, 48, 0.3)",
+  },
+  errorText: {
+    color: "#FFE5E5",
+    fontSize: 14,
+    textAlign: "center",
+    fontWeight: "500",
+  },
+  loginButton: {
+    backgroundColor: "rgba(255,255,255,0.2)",
+    borderRadius: 16,
+    paddingVertical: 18,
     alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#4a00e0",
-    borderRadius: 18,
-    paddingVertical: 20,
-    paddingHorizontal: 32,
-    marginTop: 24,
-    shadowColor: "#4a00e0",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.22,
-    shadowRadius: 12,
-    elevation: 8,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.3)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  buttonText: {
-    color: "#fff",
-    fontSize: 22,
-    fontWeight: "bold",
-    letterSpacing: 0.2,
+  loginButtonDisabled: {
+    backgroundColor: "rgba(255,255,255,0.1)",
+    borderColor: "rgba(255,255,255,0.1)",
   },
-  buttonDisabled: {
-    backgroundColor: "#aaa",
-    shadowOpacity: 0.08,
+  loginButtonText: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "600",
+  },
+  footer: {
+    alignItems: "center",
+  },
+  footerText: {
+    fontSize: 12,
+    color: "rgba(255,255,255,0.6)",
+    textAlign: "center",
   },
 });

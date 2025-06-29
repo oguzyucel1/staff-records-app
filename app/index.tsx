@@ -2,10 +2,15 @@ import { Redirect } from "expo-router";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { View, ActivityIndicator } from "react-native";
+import { useFonts } from "expo-font";
+import { Slot } from "expo-router";
 
 export default function Index() {
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fontsLoaded] = useFonts({
+    "OpenSans-Variable": require("../assets/fonts/OpenSans-Variable.ttf"),
+  });
 
   useEffect(() => {
     const checkAuth = async () => {
